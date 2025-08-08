@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Memeac Visits Simulation</title>
+</head>
+
+<body>
+    <h1>Memeac Visit Simulator</h1>
+    <p>Simulates multiple “visits” to a URL without navigating away.</p>
+    <button id="start">Start Simulation</button>
+    <p id="status"></p>
+
+    <script>
+        //const targetUrl = 'https://open.spotify.com/genre/0JQ5DAqbMKFKDIyhfS9NTT?_reload_cause=mera-marzi-kya-kar-lega-re-tu';
+        const targetUrl = 'http://localhost:8090/manager/html';
+        const maxVisits = 1000;
+        let count = 0;
+
+        const statusEl = document.getElementById('status');
+        const btn = document.getElementById('start');
+
+        btn.addEventListener('click', () => {
+            btn.disabled = true;
+            simulateVisit();
+        });
+
+        function simulateVisit() {
+            if (count < maxVisits) {
+                count++;
+                statusEl.textContent = `Simulated visit #${count}`;
+
+                // 1. Fire a tracking request to mimic a "hit"
+                const img = new Image();
+                img.src = `${targetUrl}&cache_buster=${Date.now()}`;
+
+                // 2. Optionally update the address bar without reloading
+                try {
+                    window.history.pushState({ visit: count }, '', `?visit=${count}`);
+                } catch (e) {
+                    console.warn('History API unsupported:', e);
+                }
+
+                setTimeout(simulateVisit, 100);
+            } else {
+                statusEl.textContent = `Completed ${count} simulated visits!`;
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>
